@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://ik.imagekit.io/vu8sp3yvf/insta_clone/vecteezy_default-male-avatar-profile-icon-social-media-chatting_25337669.jpg?updatedAt=1792690330587'
   }
+}, {
+  timestamps: true
 });
 
 const User = mongoose.model('User', userSchema);

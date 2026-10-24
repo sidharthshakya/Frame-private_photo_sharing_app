@@ -1,5 +1,6 @@
 const ImageKit = require('@imagekit/nodejs');
 const { toFile } = require('@imagekit/nodejs');
+const Post = require('../models/post.model');
 
 const client = new ImageKit({
     privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
@@ -9,12 +10,31 @@ const createPostController = async (req, res) => {
 
     try {
 
+        if (!req.file) {
+            return res.status(400).json({
+                message: 'Image file is required for a post'
+            });
+        }
+
+        const user = req.user;
+        const { caption } = req.body;
         const { originalname, buffer } = req.file;
 
-        await client.files.upload({
+        const file = await client.files.upload({
             file: await toFile(Buffer.from(buffer), 'file'),
             fileName: originalname,
-            folder:'/insta_clone/posts'
+            folder: '/insta_clone/posts'
+        });
+
+        const post = await Post.create({
+            caption,
+            img_url: file.url,
+            author: user._id
+        });
+
+        return res.status(201).json({
+            message: 'post created successfully',
+            post
         });
 
     } catch (err) {

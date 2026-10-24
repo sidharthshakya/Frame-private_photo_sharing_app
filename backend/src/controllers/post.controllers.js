@@ -46,4 +46,28 @@ const createPostController = async (req, res) => {
 
 };
 
-module.exports = { createPostController };
+const getPostController = async (req, res) => {
+
+    try {
+
+        const user = req.user;
+
+        const posts = await Post.find({
+            author: user._id
+        });
+
+        return res.status(200).json({
+            message: 'posts fetched successfully',
+            posts
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: 'internal error',
+            error: err.message
+        });
+    }
+
+};
+
+module.exports = { createPostController, getPostController };

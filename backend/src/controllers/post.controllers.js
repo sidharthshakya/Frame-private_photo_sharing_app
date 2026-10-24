@@ -70,4 +70,40 @@ const getPostController = async (req, res) => {
 
 };
 
-module.exports = { createPostController, getPostController };
+const getPostByIdController = async (req, res) => {
+
+    try {
+
+        const user = req.user;
+        const postId = req.params.id
+
+        const post = await Post.findById(postId)
+
+        if (!post) {
+            return res.status(404).json({
+                message: 'Post not found',
+            });
+        }
+
+        if(post.author.toString() !== user._id.toString()){
+            return res.status(401).json({
+            message: 'unauthorized access',
+        });    
+        }
+
+        return res.status(200).json({
+            message: 'post fetched successfully',
+            post
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: 'internal error',
+            error: err.message
+        });
+    }
+
+};
+
+
+module.exports = { createPostController, getPostController, getPostByIdController };

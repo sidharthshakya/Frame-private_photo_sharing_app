@@ -45,4 +45,48 @@ const likeController = async (req, res) => {
 
 };
 
-module.exports = { likeController };
+const unlikeController = async (req, res) => {
+
+    try {
+
+        const userId = req.user._id
+        const postId = req.params.postId
+
+        const post = await Post.findById(postId)
+
+        if(!post){
+        return res.status(404).json({
+            message: 'post not found',
+        });    
+        }
+
+        const isLiked = await Like.findOne({
+            likedBy: userId,
+            postLiked: postId
+        })
+
+        if(!isLiked){
+            return res.status(404).json({
+            message: 'like not found',
+        });
+        }
+
+        await Like.deleteOne({
+            likedBy: userId,
+            postLiked: postId
+        })
+
+        return res.status(201).json({
+            message: 'unliked successfully',
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: 'internal error',
+            error: err.message
+        });
+    }
+
+};
+
+module.exports = { likeController, unlikeController };

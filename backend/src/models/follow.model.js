@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const { Schema } = require('mongoose');
 
-const postSchema = new mongoose.Schema({
-    follower: {
+const followSchema = new mongoose.Schema({
+    followBy: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    followee: {
+    follow: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -16,6 +16,8 @@ const postSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Post = mongoose.model('Post', postSchema);
+followSchema.index({ followBy: 1, follow: 1 }, { unique: true });
 
-module.exports = Post;
+const Follow = mongoose.model('Follow', followSchema);
+
+module.exports = Follow;

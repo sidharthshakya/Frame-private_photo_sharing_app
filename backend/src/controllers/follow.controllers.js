@@ -1,5 +1,6 @@
 const Follow = require("../models/follow.model");
 const User = require("../models/user.model");
+const Request = require("../models/request.model");
 
 const followController = async (req, res) => {
 
@@ -27,19 +28,31 @@ const followController = async (req, res) => {
             follow: followId
         });
 
+        const alreadyRequested = await Request.findOne({
+            requestBy: userId,
+            requestFor: followId
+        });
+
+
         if (alreadyFollowing) {
             return res.status(409).json({
                 message: 'already following',
             });
         }
 
-        await Follow.create({
-            followBy: userId,
-            follow: followId
+        if (alreadyRequested) {
+            return res.status(409).json({
+                message: 'already requested',
+            });
+        }
+
+        await Request.create({
+            requestBy: userId,
+            requestFor: followId
         });
 
         return res.status(201).json({
-            message: 'successfully following',
+            message: 'successfully requested',
         });
 
     } catch (err) {

@@ -2,7 +2,7 @@ const Follow = require("../models/follow.model");
 const User = require("../models/user.model");
 const Request = require("../models/request.model");
 
-const followController = async (req, res) => {
+const followRequestController = async (req, res) => {
 
     try {
 
@@ -64,6 +64,55 @@ const followController = async (req, res) => {
 
 };
 
+const followController = async(req,res)=>{
+    try {
+
+        const userId = req.user._id.toString();
+        const requestId = req.params.requestId;
+
+        if (userId === requestId) {
+            return res.status(400).json({
+                message: 'you cannot follow yourself',
+            });
+        }
+
+        const requestExist = await User.findById(requestId);
+
+        if (!resquestExist) {
+            return res.status(404).json({
+                message: 'user not found',
+            });
+        }
+
+        const alreadyFollowing = await Follow.findOne({
+            followBy: requestId,
+            follow: userId
+        });
+
+
+        if (alreadyFollowing) {
+            return res.status(409).json({
+                message: 'already following',
+            });
+        }
+
+        await Follow.create({
+            followBy: requestId,
+            follow: userId
+        });
+
+        return res.status(201).json({
+            message: 'successfully requested',
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            message: 'internal error',
+            error: err.message
+        });
+    }
+}
+
 const unfollowController = async (req, res) => {
 
     try {
@@ -114,4 +163,4 @@ const unfollowController = async (req, res) => {
 
 };
 
-module.exports = { followController, unfollowController };
+module.exports = { followRequestController, unfollowController, followController };
